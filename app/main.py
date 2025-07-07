@@ -6,9 +6,9 @@ from fastapi.staticfiles import StaticFiles
 
 from app.routers import auth
 
-# from app.routers import auth, face_match, task, user  # Ensure proper import paths
 
 app = FastAPI()
+
 
 # CORS Middleware
 app.add_middleware(
@@ -18,6 +18,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.mount("/media", StaticFiles(directory="media"), name="media")
 
 
 # Custom error handler
