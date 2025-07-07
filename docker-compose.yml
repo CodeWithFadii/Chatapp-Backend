@@ -24,4 +24,4 @@ services:
 volumes:
   postgres_data:
     external: true
-    name: chatapp-backend_postgres_data
+    name: my_postgres_data
