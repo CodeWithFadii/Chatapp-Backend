@@ -181,3 +181,17 @@ def change_profile_image(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to update image: {str(e)}")
+
+
+@router.get("/me", response_model=schemas.User)
+def get_current_user_data(
+    db: Session = Depends(get_db),
+    current_user: schemas.User = Depends(oauth2.get_current_user),
+):
+    try:
+        user = db.query(models.User).filter(models.User.id == current_user.id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        return schemas.User.model_validate(user)
+    except SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
