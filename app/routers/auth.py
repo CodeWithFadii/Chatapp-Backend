@@ -1,4 +1,5 @@
-from fastapi import Depends, File, HTTPException, UploadFile, status, APIRouter
+from typing import Optional
+from fastapi import Depends, File, Form, HTTPException, UploadFile, status, APIRouter
 from sqlalchemy.orm import Session
 from app import models, oauth2, schemas, utils
 from app.database import get_db
@@ -173,7 +174,7 @@ def change_profile_image(
         filename = f"{current_user.id}.jpg"
         image_url = utils.save_uploaded_image(file, filename)
 
-        db_user.profile_img = image_url # type: ignore
+        db_user.profile_img = image_url  # type: ignore
         db.commit()
         db.refresh(db_user)
 
@@ -194,4 +195,36 @@ def get_current_user_data(
             raise HTTPException(status_code=404, detail="User not found")
         return schemas.User.model_validate(user)
     except SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+
+@router.post("/update_profile", response_model=schemas.User)
+def update_profile(
+    name: Optional[str] = Form(None),
+    file: Optional[UploadFile] = File(None),
+    db: Session = Depends(get_db),
+    current_user: schemas.User = Depends(oauth2.get_current_user),
+):
+    try:
+        db_user = (
+            db.query(models.User).filter(models.User.id == current_user.id).first()
+        )
+        if not db_user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        if name:
+            db_user.name = name  # type: ignore
+
+        if file:
+            filename = f"{current_user.id}.jpg"
+            image_url = utils.save_uploaded_image(file, filename)
+            db_user.profile_img = image_url  # type: ignore
+
+        db.commit()
+        db.refresh(db_user)
+
+        return schemas.User.model_validate(db_user)
+
+    except SQLAlchemyError as e:
+        db.rollback()
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
