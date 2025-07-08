@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 from fastapi import Depends, File, Form, HTTPException, UploadFile, status, APIRouter
 from sqlalchemy.orm import Session
@@ -218,7 +219,10 @@ def update_profile(
         if file:
             filename = f"{current_user.id}.jpg"
             image_url = utils.save_uploaded_image(file, filename)
-            db_user.profile_img = image_url  # type: ignore
+            image_url_with_version = (
+                f"{image_url}?v={int(datetime.utcnow().timestamp())}"
+            )
+            db_user.profile_img = image_url_with_version  # type: ignore
 
         db.commit()
         db.refresh(db_user)
