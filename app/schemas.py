@@ -68,38 +68,17 @@ class CodeRequest(BaseModel):
     code: str
 
 
-# # Task schema------------------
+# # Chat schema------------------
 
 
-# class TaskBase(BaseModel):
-#     title: str
-#     details: str
-#     team_members: Optional[List[str]] = []
-#     date: str
-#     time: str
+class ChatOut(BaseModel):
+    id: UUID
+    user1_id: UUID
+    user2_id: UUID
+    created_at: datetime
 
-
-# class TaskCreate(TaskBase):
-#     owner_id: Optional[str] = ""
-#     pass
-
-
-# class TaskUpdate(TaskBase):
-#     pass
-
-
-# class Task(BaseModel):
-#     id: UUID
-#     owner_id: str
-#     title: str
-#     details: str
-#     team_members: Optional[List[str]] = []
-#     date: str
-#     time: str
-#     is_completed: Optional[bool] = False
-#     created_at: datetime
-
-#     model_config = {"from_attributes": True, "json_encoders": {UUID: lambda v: str(v)}}
+    class Config:
+        from_attributes = True
 
 
 # JWT Token schema------------------
@@ -112,24 +91,3 @@ class TokenData(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
-
-
-# Pagination schema------------------
-
-
-class PaginatedUsers(BaseModel):
-    users: List[User]
-    total_count: int
-    next_cursor: Optional[UUID]
-
-
-# Otp schema------------------
-
-
-# class OtpOut(BaseModel):
-#     otp: str
-#     message: str
-
-
-# class Otp(BaseModel):
-#     email: EmailStr

@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.routers import auth
+from app.routers import auth, chat
 
 
 app = FastAPI()
@@ -37,6 +37,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 # Routers
 app.include_router(auth.router)
+app.include_router(chat.router)
 
 
 @app.get("/")
